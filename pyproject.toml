@@ -13,4 +13,4 @@ build-backend = "hatchling.build"
 requires = ["hatchling"]
 
 [project.scripts]
-lint_utils = "lint_utils.__main__:cli"
+lint-utils = "lint_utils.__main__:cli"
