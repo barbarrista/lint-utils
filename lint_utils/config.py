@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Self
+from typing import TypeVar
 import msgspec
 
 from lint_utils.common.std import report_error
@@ -13,6 +13,9 @@ class Base(
     pass
 
 
+_T = TypeVar("_T", bound=Base)
+
+
 class LintConfig(Base):
     ignore: list[str] = msgspec.field(default_factory=list)
     exclude_classes: list[str] = msgspec.field(default_factory=list)
@@ -23,6 +26,14 @@ class LintUtilsConfig(Base):
     lint: LintConfig = msgspec.field(default_factory=LintConfig)
     exclude: list[str] = msgspec.field(default_factory=list)
 
+    @classmethod
+    def from_toml(cls, path: Path) -> "LintUtilsConfig | None":
+        tool = _from_toml(Tool, path=path)
+        if tool is None:
+            return None
+
+        return tool.lint_utils
+
 
 class Tool(Base):
     lint_utils: LintUtilsConfig | None = None
@@ -32,13 +43,17 @@ class PyProject(Base):
     tool: Tool | None = None
 
     @classmethod
-    def from_toml(cls, path: Path) -> Self | None:
-        try:
-            with path.open("r", encoding="UTF-8") as file:
-                return msgspec.toml.decode(file.read(), type=PyProject)
-        except OSError as exc:
-            if isinstance(exc, FileNotFoundError):
-                return None
+    def from_toml(cls, path: Path) -> "PyProject | None":
+        return _from_toml(PyProject, path=path)
 
-            msg = f"There was a problem parsing the file pyproject.toml. Error: {repr(exc)}"
-            report_error(msg)
+
+def _from_toml(model: type[_T], *, path: Path) -> _T | None:
+    try:
+        with path.open("r", encoding="UTF-8") as file:
+            return msgspec.toml.decode(file.read(), type=model)
+    except OSError as exc:
+        if isinstance(exc, FileNotFoundError):
+            return None
+
+        msg = f"There was a problem parsing the file {path.name}. Error: {repr(exc)}"
+        report_error(msg)
