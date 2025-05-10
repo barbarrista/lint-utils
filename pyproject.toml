@@ -40,7 +40,7 @@ lint = [
 ]
 
 [tool.commitizen]
-changelog_start_rev = "0.1.0"
+changelog_start_rev = "0.1.1"
 name = "cz_conventional_commits"
 tag_format = "$version"
 update_changelog_on_bump = true
