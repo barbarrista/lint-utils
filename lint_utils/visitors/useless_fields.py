@@ -51,11 +51,6 @@ class UselessFieldVisitor(BaseVisitor):
 
         raise ValueError
 
-    def _clear(self) -> None:
-        self._class_name = None
-        self._base_class_names = None
-        self._field_definitions = {}
-
     def visit_ClassDef(self, node: ast.ClassDef) -> Any:
         if self.can_skip_visitor:
             return
@@ -76,9 +71,19 @@ class UselessFieldVisitor(BaseVisitor):
         self.generic_visit(node)
 
     def visit_Attribute(self, node: ast.Attribute) -> Any:
+        root_node = _find_root_node(node)
+        key = self._build_field_key(_get_field_name(root_node))
+        field = self._field_definitions.get(key, None)
+
+        if field is None:
+            return self.generic_visit(node)
+
         if isinstance(node.ctx, ast.Load):
-            root_node = _find_root_node(node)
-            self._field_definitions.pop(self._build_field_key(root_node.attr), None)
+            del self._field_definitions[key]
+
+        if isinstance(node.ctx, ast.Store):
+            if node.lineno > field.line:
+                del self._field_definitions[key]
 
         return self.generic_visit(node)
 
@@ -118,8 +123,8 @@ class UselessFieldVisitor(BaseVisitor):
                         continue
 
                     field_info = FieldInfo(
-                        class_name=self._class_name,
-                        name=target.attr,
+                        class_name=self.class_name,
+                        name=_get_field_name(target),
                         line=target.lineno,
                         col_offset=target.col_offset,
                         assigned_to=_get_assigned_to(item),
@@ -131,8 +136,8 @@ class UselessFieldVisitor(BaseVisitor):
                         continue
 
                     field_info = FieldInfo(
-                        class_name=self._class_name,
-                        name=target.attr,
+                        class_name=self.class_name,
+                        name=_get_field_name(target),
                         line=target.lineno,
                         col_offset=target.col_offset,
                         assigned_to=_get_assigned_to(item),
@@ -152,6 +157,13 @@ class UselessFieldVisitor(BaseVisitor):
 
     def _build_field_key(self, field_name: str) -> str:
         return f"{self._class_name}_{field_name}"
+
+
+def _get_field_name(node: ast.Attribute) -> str:
+    if isinstance(node.value, ast.Name):
+        return f"{node.value.id}.{node.attr}"
+
+    return node.attr
 
 
 def _get_assigned_to(attr: ast.Assign | ast.AnnAssign) -> str | None:
@@ -176,33 +188,33 @@ def check_useless_field(
 ) -> bool:
     has_errors = []
     for module in ast.walk(info.tree):
-        if isinstance(module, ast.Module):
-            for item in module.body:
-                if not isinstance(item, ast.ClassDef):
-                    continue
+        if not isinstance(module, ast.Module):
+            continue
 
-                visitor = UselessFieldVisitor(
-                    file_info=FileInfoDTO(
-                        source_code_lines=info.raw.split("\n"),
-                        path=file_path,
-                    ),
-                    config=config,
-                )
-                visitor.visit(item)
+        for item in module.body:
+            if not isinstance(item, ast.ClassDef):
+                continue
 
-                if visitor.useless_fields:
-                    msg = f"{to_bold(to_cyan(visitor.rule))} Unused object class fields found in class {to_bold(visitor.class_name)}"
-                    report_info(msg)
-                    for field_info in visitor.useless_fields.values():
-                        full_path = f"{file_path.as_posix()}:{field_info.line}:{field_info.col_offset + 1}"
-                        line_msg = (
-                            f"{full_path} {to_bold(to_red(f'self.{field_info.name}'))}"
-                        )
-                        report_info(line_msg)
-                    report_info("")
+            visitor = UselessFieldVisitor(
+                file_info=FileInfoDTO(
+                    source_code_lines=info.raw.split("\n"),
+                    path=file_path,
+                ),
+                config=config,
+            )
+            visitor.visit(item)
 
-                    has_errors.append(True)
+            if visitor.useless_fields:
+                msg = f"{to_bold(to_cyan(visitor.rule))} Unused object class fields found in class {to_bold(visitor.class_name)}"
+                report_info(msg)
+                for field_info in visitor.useless_fields.values():
+                    full_path = f"{file_path.as_posix()}:{field_info.line}:{field_info.col_offset + 1}"
+                    line_msg = f"{full_path} {to_bold(to_red(field_info.name))}"
+                    report_info(line_msg)
+                report_info("")
 
-                has_errors.append(False)
+                has_errors.append(True)
+
+            has_errors.append(False)
 
     return any(has_errors)
