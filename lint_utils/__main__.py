@@ -1,12 +1,13 @@
 from collections.abc import Sequence
 from pathlib import Path
+
 import click
 
 from lint_utils._cli_commands.check import CheckCommand
-from lint_utils.config import LintUtilsConfig, PyProject
 from lint_utils.common.std import report_info
 from lint_utils.common.text_styling import pluralize, to_bold, to_green, to_red
 from lint_utils.common.timer import Timer
+from lint_utils.config import LintUtilsConfig, PyProject
 
 
 @click.group()
@@ -45,7 +46,7 @@ def check(args: Sequence[str]) -> None:
         report_info(to_bold(to_green("No errors found. All is well 🤗")))
 
     total_info = f"Processed {files_count} {pluralize(files_count, 'file')} at {timer.total_seconds}"
-    report_info(to_bold((total_info)))
+    report_info(to_bold(total_info))
 
 
 def _report_config_warning(

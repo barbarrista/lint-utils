@@ -1,12 +1,13 @@
 import ast
-from typing import Protocol
+from typing import ClassVar, Protocol
 
 from lint_utils.config import LintUtilsConfig
 from lint_utils.visitors.dto import FileInfoDTO
 
 
 class HasRuleProtocol(Protocol):
-    rule: str
+    rule: ClassVar[str]
+
     _config: LintUtilsConfig | None
     _file_info: FileInfoDTO
 

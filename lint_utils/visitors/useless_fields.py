@@ -1,13 +1,14 @@
 import ast
-from dataclasses import dataclass
 import itertools
+from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Final, Mapping, TypeAlias
+from typing import Any, ClassVar, TypeAlias
 
-from lint_utils.config import LintUtilsConfig
-from lint_utils.rules import Rule, can_ignore_rule
 from lint_utils.common.std import report_info
 from lint_utils.common.text_styling import to_bold, to_cyan, to_red
+from lint_utils.config import LintUtilsConfig
+from lint_utils.rules import Rule, can_ignore_rule
 from lint_utils.tree_info import TreeInfo
 from lint_utils.visitors.base import BaseVisitor
 from lint_utils.visitors.dto import FileInfoDTO
@@ -25,7 +26,7 @@ class FieldInfo:
 
 
 class UselessFieldVisitor(BaseVisitor):
-    rule: Final[str] = Rule.useless_field
+    rule: ClassVar[str] = Rule.useless_field
 
     def __init__(
         self,
@@ -51,7 +52,7 @@ class UselessFieldVisitor(BaseVisitor):
 
         raise ValueError
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> Any:
+    def visit_ClassDef(self, node: ast.ClassDef) -> Any:  # noqa: ANN401, N802
         if self.can_skip_visitor:
             return
 
@@ -70,7 +71,7 @@ class UselessFieldVisitor(BaseVisitor):
 
         self.generic_visit(node)
 
-    def visit_Attribute(self, node: ast.Attribute) -> Any:
+    def visit_Attribute(self, node: ast.Attribute) -> Any:  # noqa: ANN401, N802
         root_node = _find_root_node(node)
         key = self._build_field_key(_get_field_name(root_node))
         field = self._field_definitions.get(key, None)
@@ -81,9 +82,8 @@ class UselessFieldVisitor(BaseVisitor):
         if isinstance(node.ctx, ast.Load):
             del self._field_definitions[key]
 
-        if isinstance(node.ctx, ast.Store):
-            if node.lineno > field.line:
-                del self._field_definitions[key]
+        if isinstance(node.ctx, ast.Store) and node.lineno > field.line:
+            del self._field_definitions[key]
 
         return self.generic_visit(node)
 
@@ -107,14 +107,9 @@ class UselessFieldVisitor(BaseVisitor):
         return is_excluded or self.class_name in all_excluded_classes
 
     def _get_parent_class_names(self, node: ast.ClassDef) -> list[str] | None:
-        base_names = []
-        for base in node.bases:
-            if isinstance(base, ast.Name):
-                base_names.append(base.id)
+        return [base.id for base in node.bases if isinstance(base, ast.Name)]
 
-        return base_names
-
-    def _process_init_assignment(self, method: FuncDef):
+    def _process_init_assignment(self, method: FuncDef) -> None:
         for item in method.body:
             match item:
                 case ast.Assign():
@@ -168,7 +163,7 @@ def _get_field_name(node: ast.Attribute) -> str:
 
 def _get_assigned_to(attr: ast.Assign | ast.AnnAssign) -> str | None:
     if not isinstance(attr.value, ast.Name):
-        return
+        return None
 
     return attr.value.id
 

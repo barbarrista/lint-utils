@@ -14,7 +14,7 @@ def to_bold(text: str) -> str:
     return f"\033[1m{text}\033[0m"
 
 
-def pluralize(count: int, singular: str, *, plural: str | None = None):
+def pluralize(count: int, singular: str, *, plural: str | None = None) -> str:
     if count == 1:
         return singular
 

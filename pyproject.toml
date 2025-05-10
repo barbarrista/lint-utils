@@ -22,3 +22,99 @@ exclude = []
 lint.exclude_base_classes = []
 lint.exclude_classes = []
 lint.ignore = []
+
+[dependency-groups]
+dev = [
+  "commitizen>=4.7.0",
+]
+lint = [
+  "mypy>=1.15.0",
+  "ruff>=0.11.9",
+]
+
+[tool.commitizen]
+changelog_start_rev = "0.1.0"
+name = "cz_conventional_commits"
+tag_format = "$version"
+update_changelog_on_bump = true
+version = "0.1.0"
+version_files = [
+  "pyproject.toml:version",
+]
+
+[tool.ruff]
+exclude = []
+lint.fixable = [
+  "F",
+  "E",
+  "W",
+  "I",
+  "COM",
+  "UP",
+  "RUF",
+]
+lint.ignore = [
+  "PLR2044",
+  "E501", # Line Length
+  "A003", # Class attribute ... is shadowing a python builtin
+  "D", # pydocstyle
+  "PD", # pandas-vet
+  "INP",
+  "TC001",
+  "TC002",
+  "TC003",
+  "EXE",
+  "RUF001",
+  "RUF002",
+  "RUF003",
+  "COM812",
+  "ISC001",
+]
+lint.select = ["ALL"]
+src = ["lint_utils", "tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+  "S101",
+  "S311",
+  "PLR0913",
+  "ARG005",
+]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+
+[tool.ruff.lint.mccabe]
+max-complexity = 7
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = []
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = [
+  "classmethod",
+]
+staticmethod-decorators = ["staticmethod"]
+
+[tool.mypy]
+exclude = ""
+plugins = []
+
+follow_imports = "silent"
+ignore_missing_imports = true
+
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_ignores = true
+
+strict = true
+strict_equality = true
+strict_optional = true

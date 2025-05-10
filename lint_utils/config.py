@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import TypeVar
+
 import msgspec
 
 from lint_utils.common.std import report_error
@@ -55,5 +56,7 @@ def _from_toml(model: type[_T], *, path: Path) -> _T | None:
         if isinstance(exc, FileNotFoundError):
             return None
 
-        msg = f"There was a problem parsing the file {path.name}. Error: {repr(exc)}"
+        msg = f"There was a problem parsing the file {path.name}. Error: {exc!r}"
         report_error(msg)
+
+    return None
