@@ -12,6 +12,6 @@ class TreeInfo:
 
 
 def get_tree_info(file_path: Path) -> TreeInfo | None:
-    with suppress(SyntaxError, OSError), file_path.open("r", encoding="UTF-8") as file:
+    with suppress(SyntaxError, OSError, UnicodeDecodeError), file_path.open("r", encoding="UTF-8") as file:
         source = file.read()
         return TreeInfo(tree=ast.parse(source), raw=source)
