@@ -11,13 +11,13 @@ pip install lint_utils
 ## Usage
 
 ```bash
-lint utils check src
+lint-utils check src
 ```
 
 or
 
 ```bash
-lint utils check path/to/file_1.py path/to/file_2/ path/to/dir
+lint-utils check path/to/file_1.py path/to/file_2/ path/to/dir
 ```
 
 ## Configuration
