@@ -1,3 +1,9 @@
+## 0.1.5 (2025-05-11)
+
+### Refactor
+
+- support short "lu" command like "lint-utils"
+
 ## 0.1.4 (2025-05-11)
 
 ### Refactor
