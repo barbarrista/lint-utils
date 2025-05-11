@@ -24,14 +24,14 @@ requires = ["hatchling"]
 [project.scripts]
 lint-utils = "lint_utils.__main__:cli"
 
-[tool.lint_utils]
+[tool.lint-utils]
 exclude = []
 lint.ignore = []
 
-[tool.lint_utils.exclude-base-classes]
+[tool.lint-utils.exclude-base-classes]
 USL001 = []
 
-[tool.lint_utils.exclude-classes]
+[tool.lint-utils.exclude-classes]
 USL001 = []
 
 [dependency-groups]

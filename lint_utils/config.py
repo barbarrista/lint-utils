@@ -37,7 +37,7 @@ class LintUtilsConfig(Base, rename="kebab"):
         return tool.lint_utils
 
 
-class Tool(Base):
+class Tool(Base, rename="kebab"):
     lint_utils: LintUtilsConfig | None = None
 
 

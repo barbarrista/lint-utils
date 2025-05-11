@@ -150,7 +150,7 @@ class UselessFieldVisitor(BaseVisitor):
 
             if can_ignore_rule(
                 self._file_info.source_code_lines,
-                line=field_info.line - 1,
+                line_number=field_info.line - 1,
                 rule=self.rule,
             ):
                 continue
