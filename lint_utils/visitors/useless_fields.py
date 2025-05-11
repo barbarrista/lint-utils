@@ -1,6 +1,6 @@
 import ast
 import itertools
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, ClassVar, TypeAlias
@@ -40,6 +40,15 @@ class UselessFieldVisitor(BaseVisitor):
         self._base_class_names: list[str] | None = None
         self._field_definitions: dict[str, FieldInfo] = {}
         self._config = config
+
+        self._excluded_classes: Iterable[str] = ()
+        self._excluded_base_classes: Iterable[str] = ()
+
+        if self._config:
+            self._excluded_classes = self._config.exclude_classes.get(self.rule, ())
+            self._excluded_base_classes = self._config.exclude_base_classes.get(
+                self.rule, ()
+            )
 
     @property
     def useless_fields(self) -> Mapping[str, FieldInfo]:
@@ -92,10 +101,8 @@ class UselessFieldVisitor(BaseVisitor):
         if self._config is None or self._config.lint is None:
             return False
 
-        excluded_classes = self._config.lint.exclude_classes or ()
-        excluded_base_classes = self._config.lint.exclude_base_classes or ()
         all_excluded_classes = list(
-            itertools.chain(excluded_classes, excluded_base_classes)
+            itertools.chain(self._excluded_classes, self._excluded_base_classes)
         )
 
         is_excluded = False

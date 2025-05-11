@@ -26,9 +26,13 @@ lint-utils = "lint_utils.__main__:cli"
 
 [tool.lint_utils]
 exclude = []
-lint.exclude_base_classes = []
-lint.exclude_classes = []
 lint.ignore = []
+
+[tool.lint_utils.exclude-base-classes]
+USL001 = []
+
+[tool.lint_utils.exclude-classes]
+USL001 = []
 
 [dependency-groups]
 dev = [

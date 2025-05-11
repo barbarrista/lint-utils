@@ -30,6 +30,16 @@ def check(args: Sequence[str]) -> None:
     with Timer() as timer:
         for arg in args:
             root_path = Path(arg)
+            if not root_path.exists():
+                report_info(
+                    to_bold(
+                        to_red(
+                            f'Directory of file with name "{root_path.as_posix()}" doesn\'t exists'
+                        )
+                    )
+                )
+                return
+
             paths = root_path.rglob("*.py") if root_path.is_dir() else (root_path,)
             command = CheckCommand(paths=paths, config=config)
             result = command.execute()

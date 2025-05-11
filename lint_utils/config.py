@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from pathlib import Path
 from typing import TypeVar
 
@@ -19,13 +20,13 @@ _T = TypeVar("_T", bound=Base)
 
 class LintConfig(Base):
     ignore: list[str] = msgspec.field(default_factory=list)
-    exclude_classes: list[str] = msgspec.field(default_factory=list)
-    exclude_base_classes: list[str] = msgspec.field(default_factory=list)
 
 
-class LintUtilsConfig(Base):
+class LintUtilsConfig(Base, rename="kebab"):
     lint: LintConfig = msgspec.field(default_factory=LintConfig)
     exclude: list[str] = msgspec.field(default_factory=list)
+    exclude_classes: Mapping[str, list[str]] = msgspec.field(default_factory=dict)
+    exclude_base_classes: Mapping[str, list[str]] = msgspec.field(default_factory=dict)
 
     @classmethod
     def from_toml(cls, path: Path) -> "LintUtilsConfig | None":
