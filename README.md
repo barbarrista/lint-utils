@@ -23,6 +23,7 @@ lu check path/to/file_1.py path/to/file_2/ path/to/dir
 ## Aliases
 
 short alias: `lu check ...`
+
 full alias `lint-utils check ...`
 
 ## Rules
