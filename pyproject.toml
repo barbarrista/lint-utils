@@ -23,6 +23,7 @@ requires = ["hatchling"]
 
 [project.scripts]
 lint-utils = "lint_utils.__main__:cli"
+lu = "lint_utils.__main__:cli"
 
 [tool.lint-utils]
 exclude = []
