@@ -1,3 +1,9 @@
+## 0.1.8 (2025-05-13)
+
+### Refactor
+
+- change report_info to report_error
+
 ## 0.1.7 (2025-05-11)
 
 ## 0.1.6 (2025-05-11)
