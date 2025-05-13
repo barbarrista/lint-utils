@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 
 from lint_utils._cli_commands.check import CheckCommand
-from lint_utils.common.std import report_info
+from lint_utils.common.std import report_error, report_info
 from lint_utils.common.text_styling import pluralize, to_bold, to_green, to_red
 from lint_utils.common.timer import Timer
 from lint_utils.config import LintUtilsConfig, PyProject
@@ -24,14 +24,14 @@ def check(args: Sequence[str]) -> None:
     not_processed_files: list[str] = []
 
     if not args:
-        report_info(to_red("Please provide the file or directory name"))
+        report_error(to_red("Please provide the file or directory name"))
         return
 
     with Timer() as timer:
         for arg in args:
             root_path = Path(arg)
             if not root_path.exists():
-                report_info(
+                report_error(
                     to_bold(
                         to_red(
                             f'Directory of file with name "{root_path.as_posix()}" doesn\'t exists'
@@ -51,7 +51,7 @@ def check(args: Sequence[str]) -> None:
     if errors_files_count > 0:
         files_part = pluralize(errors_files_count, "file")
         msg = to_bold(to_red(f"Errors found in {errors_files_count} {files_part} 😱"))
-        report_info(msg)
+        report_error(msg)
     else:
         report_info(to_bold(to_green("No errors found. All is well 🤗")))
 
