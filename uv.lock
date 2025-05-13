@@ -124,7 +124,7 @@ wheels = [
 
 [[package]]
 name = "lint-utils"
-version = "0.1.0"
+version = "0.1.8"
 source = { editable = "." }
 dependencies = [
     { name = "click" },

@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -57,6 +58,9 @@ def check(args: Sequence[str]) -> None:
 
     total_info = f"Processed {files_count} {pluralize(files_count, 'file')} at {timer.total_seconds}"
     report_info(to_bold(total_info))
+
+    if errors_files_count > 0:
+        sys.exit(1)
 
 
 def _report_config_warning(
