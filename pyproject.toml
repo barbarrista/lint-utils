@@ -21,9 +21,19 @@ version = "0.1.9"
 build-backend = "hatchling.build"
 requires = ["hatchling"]
 
+[tool.hatch.build.targets.sdist]
+ignore-vcs = true
+include = ["lint_utils/*", "tests/*", "docs/*"]
+
+[tool.hatch.build.targets.wheel]
+include = ["lint_utils/*"]
+
 [project.scripts]
 lint-utils = "lint_utils.__main__:cli"
 lu = "lint_utils.__main__:cli"
+
+[tool.uv.sources]
+lint_utils = { path = "./lint_utils/"}
 
 [tool.lint-utils]
 exclude = []
