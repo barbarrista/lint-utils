@@ -32,7 +32,7 @@ full alias `lint-utils check ...`
 
 **RL001** - The reminder has expired
 
-Please enter a comment in the format "# lu: RL001[YYYY-MM-DD]: write a note here
+Please enter a comment in the format `# lu: RL001[YYYY-MM-DD]: write a note here`
 
 ```python
 class Command:
