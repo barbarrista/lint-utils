@@ -30,6 +30,16 @@ full alias `lint-utils check ...`
 
 **USL001** - Unused object class fields found
 
+**RL001** - The reminder has expired
+
+Please enter a comment in the format "# lu: RL001[YYYY-MM-DD]: write a note here
+
+```python
+class Command:
+    async def execute(self) -> int:
+        return 3  # lu: RL001[2025-07-30]: fix later
+```
+
 ## Configuration
 
 You can create `lint_utils.toml` in root project directory

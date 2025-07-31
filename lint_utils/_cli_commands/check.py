@@ -1,20 +1,18 @@
 from collections.abc import Iterable
-from dataclasses import dataclass
 from pathlib import Path
 
 from lint_utils.config import LintUtilsConfig
+from lint_utils.rules import Rule
 from lint_utils.tree_info import get_tree_info
 from lint_utils.visitors.useless_fields import check_useless_field
 
-
-@dataclass(frozen=True, slots=True, kw_only=True)
-class CheckResult:
-    files_count: int
-    errors_files_count: int
-    not_processed_files: list[str]
+from .abc_ import BaseCommand
+from .dto import CheckResult
 
 
-class CheckCommand:
+class CheckCommand(BaseCommand):
+    rule = Rule.useless_field
+
     def __init__(
         self,
         paths: Iterable[Path],

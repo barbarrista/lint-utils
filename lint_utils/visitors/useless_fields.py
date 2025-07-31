@@ -62,9 +62,6 @@ class UselessFieldVisitor(BaseVisitor):
         raise ValueError
 
     def visit_ClassDef(self, node: ast.ClassDef) -> Any:  # noqa: ANN401, N802
-        if self.can_skip_visitor:
-            return
-
         self._class_name = node.name
         self._base_class_names = self._get_parent_class_names(node)
 
@@ -182,7 +179,7 @@ def _find_root_node(node: ast.Attribute) -> ast.Attribute:
     return node
 
 
-def check_useless_field(
+def check_useless_field(  # noqa: C901
     info: TreeInfo,
     *,
     file_path: Path,
@@ -204,6 +201,9 @@ def check_useless_field(
                 ),
                 config=config,
             )
+            if visitor.can_skip_visitor:
+                continue
+
             visitor.visit(item)
 
             if visitor.useless_fields:

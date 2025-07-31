@@ -1,7 +1,8 @@
 import ast
-from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
+
+from lint_utils.common.files import open_file
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -11,11 +12,8 @@ class TreeInfo:
 
 
 def get_tree_info(file_path: Path) -> TreeInfo | None:
-    with (
-        suppress(SyntaxError, OSError, UnicodeDecodeError),
-        file_path.open("r", encoding="UTF-8") as file,
-    ):
-        source = file.read()
-        return TreeInfo(tree=ast.parse(source), raw=source)
+    source = open_file(file_path)
+    if source is None:
+        return None
 
-    return None
+    return TreeInfo(tree=ast.parse(source), raw=source)

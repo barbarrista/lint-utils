@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 
 from lint_utils._cli_commands.check import CheckCommand
+from lint_utils._cli_commands.remind_later import RemindLaterCommand
 from lint_utils.common.std import report_error, report_info
 from lint_utils.common.text_styling import pluralize, to_bold, to_green, to_red
 from lint_utils.common.timer import Timer
@@ -18,7 +19,7 @@ def cli() -> None:
 
 @cli.command("check")
 @click.argument("args", nargs=-1)
-def check(args: Sequence[str]) -> None:
+def check(args: Sequence[str]) -> None:  # noqa: C901
     config = _get_config()
     files_count = 0
     errors_files_count = 0
@@ -28,9 +29,11 @@ def check(args: Sequence[str]) -> None:
         report_error(to_red("Please provide the file or directory name"))
         return
 
+    commands = (CheckCommand, RemindLaterCommand)
+
     with Timer() as timer:
-        for arg in args:
-            root_path = Path(arg)
+        for raw_path in args:
+            root_path = Path(raw_path)
             if not root_path.exists():
                 report_error(
                     to_bold(
@@ -42,12 +45,16 @@ def check(args: Sequence[str]) -> None:
                 return
 
             paths = root_path.rglob("*.py") if root_path.is_dir() else (root_path,)
-            command = CheckCommand(paths=paths, config=config)
-            result = command.execute()
+            for command_cls in commands:
+                command = command_cls(paths=paths, config=config)
+                if command.can_skip_command:
+                    continue
 
-            not_processed_files.extend(result.not_processed_files)
-            files_count += result.files_count
-            errors_files_count += result.errors_files_count
+                result = command.execute()
+
+                not_processed_files.extend(result.not_processed_files)
+                files_count += result.files_count
+                errors_files_count += result.errors_files_count
 
     if errors_files_count > 0:
         files_part = pluralize(errors_files_count, "file")
@@ -69,7 +76,7 @@ def _report_config_warning(
 ) -> None:
     report_info(
         f"""Got two configs: {to_bold(lint_utils_path.as_posix())}, {to_bold(pyproject_path.as_posix())}
-Applied "{to_bold(to_green(pyproject_path.as_posix()))}"
+Applied {to_bold(to_green(pyproject_path.as_posix()))}
 """
     )
 
