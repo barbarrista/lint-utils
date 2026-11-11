@@ -74,13 +74,16 @@ USL001 = []
 
 ### exclude
 
-If you put a file path in the exclude list, it will be ignored during checking.
+Paths and glob patterns in the exclude list are ignored during checking. `*` matches across directories, so `tests/*` skips the whole `tests` tree.
 
 ```toml
 ...
 
 [tool.lint-utils]
-exclude = ["path/to/file.py"]
+exclude = [
+  "tests/*",
+  "path/to/file.py",
+]
 ```
 
 ### tool.lint-utils.exclude-base-classes
