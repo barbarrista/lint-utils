@@ -1,3 +1,9 @@
+## 0.2.2 (2026-11-11)
+
+### Fix
+
+- improve path exclusion logic in BaseVisitor
+
 ## 0.2.1 (2025-07-31)
 
 ## 0.2.0 (2025-07-31)
